@@ -149,6 +149,15 @@ h2{font-family:var(--f-display);font-size:22px;margin:18px 0 0}
 .bigplay{position:absolute;inset:0;z-index:7;display:flex;align-items:center;justify-content:center;background:rgba(10,10,16,.35);border:0;cursor:pointer;width:100%;padding:0}
 .bigplay span{width:84px;height:84px;border-radius:50%;background:#b49bff;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 30px rgba(0,0,0,.4)}
 .bigplay svg{width:34px;height:34px;margin-left:5px}
+/* recording mode (#rec): 1280x720 stage + 80px caption strip, nothing else */
+html.rec body{margin:0;overflow:hidden;background:#0e0e14}
+html.rec .wrap{padding:0;max-width:none;gap:0}
+html.rec header,html.rec .sheet,html.rec .wrap>h2,html.rec .note,html.rec .bar,html.rec .controls,html.rec .chapters,html.rec .bigplay{display:none!important}
+html.rec .player{border:0;border-radius:0}
+html.rec .stage{width:1280px;height:720px;aspect-ratio:auto}
+html.rec .under{height:80px;padding:12px 28px;gap:0;justify-content:center}
+html.rec .caption{font-size:21px;min-height:0;line-height:1.35}
+html.rec .caption .sc{display:none}
 @media (prefers-reduced-motion: reduce){.sprite,#prompt .caret{animation:none}.pane,#hl,.app,.seg i{transition:none}}
 </style>
 
@@ -225,6 +234,8 @@ h2{font-family:var(--f-display);font-size:22px;margin:18px 0 0}
 <script>
 (function(){
 const $=s=>document.querySelector(s);
+const REC=location.hash==='#rec'?(window.__log=[]):null;
+if(REC){document.documentElement.classList.add('rec');document.documentElement.setAttribute('data-theme','dark')}
 const app=$('#app'), stage=$('#stage'), chatEl=$('#chat'), promptEl=$('#prompt'), pane=$('#pane'), pin=$('#pin'),
       hlEl=$('#hl'), keyEl=$('#keycap'), cardEl=$('#card'), bubble=$('#bubble'), band=$('#band');
 let scale=1;
@@ -467,12 +478,13 @@ async function run(from){
    cur={s,i:0};S[s].setup();ui();
    for(let i=0;i<S[s].steps.length;i++){
     await waitUnpaused(g);cur.i=i;const [t,fn,hold]=S[s].steps[i];caption(t);ui();
+    if(REC)REC.push({n:S[s].off+i,t:Date.now()/1000});
     const sp=speak(S[s].off+i);if(fn)await fn(mk(g));await sleep(hold||1200,g);await sp;if(g!==gen)return;
    }
    await sleep(500,g);
   }
   paused=true;running=false;cur={s:S.length-1,i:S[S.length-1].steps.length-1};ui();$('#captext').textContent='Fim. Clique em uma cena para rever ou em Reproduzir para recomeçar.';
-  ended=true;
+  ended=true;if(REC)window.__done=true;
  }catch(e){if(!(e instanceof Cancel))throw e}
 }
 let ended=false;
@@ -490,6 +502,7 @@ nb.onclick=()=>{narr=!narr;narrUi();if(!narr)stopSpeech()};
 narrUi();
 document.addEventListener('keydown',e=>{if(e.target.closest('button,input,textarea'))return;if(e.code==='Space'){e.preventDefault();toggle()}else if(e.key==='ArrowRight')go(cur.s+1);else if(e.key==='ArrowLeft')go(cur.s-1)});
 
+window.__start=toggle;
 /* initial still frame */
 S[0].setup();caption('Aperte play para começar. A narração em português toca junto.');ui();
 })();

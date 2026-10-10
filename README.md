@@ -2,6 +2,16 @@
 
 Os mods do Claude Code que eu uso no dia a dia, prontos para instalar em qualquer máquina, com um guia em vídeo explicando como usar cada um.
 
+<p align="center">
+  <a href="guia/guia.mp4"><img src="guia/guia.gif" alt="Trecho do guia: o comando /skin abre o painel Skins à direita, a tecla 4 troca o tema para nord e a 3 volta para o dracula" width="800"></a>
+</p>
+
+<p align="center">
+  <b><a href="guia/guia.mp4">▶ Assistir ao guia completo com narração (MP4, 5 min)</a></b>
+  &nbsp;·&nbsp;
+  <a href="guia/index.html">versão interativa (HTML)</a>
+</p>
+
 Este repositório é um **marketplace do Claude Code**. Ele não copia o código dos mods: aponta para os repositórios originais, então cada mod continua recebendo as atualizações dos autores.
 
 | Mod | O que faz | Onde aparece |
@@ -84,7 +94,12 @@ Os ajustes do skins e do Pokémon ficam guardados pelos próprios mods, então s
 
 ## Guia em vídeo
 
-Abra [`guia/index.html`](guia/index.html) no navegador. É um vídeo animado de 10 cenas, com narração em português embutida, que mostra:
+São dois formatos com o mesmo conteúdo:
+
+- [`guia/guia.mp4`](guia/guia.mp4): vídeo de 5 minutos com narração em português. Abre em qualquer player.
+- [`guia/index.html`](guia/index.html): versão interativa. Abra no navegador para pausar, pular cenas e consultar a cola de comandos.
+
+As 10 cenas mostram:
 
 1. Os quatro mods e onde cada um aparece na tela
 2. Quando o painel lateral abre e como fechar (Esc)
@@ -165,6 +180,15 @@ python guia/fonte/embed_audio.py guia/fonte/guia-mods.html guia/fonte/audio guia
 ```
 
 O `gen_audio.py` envia o texto das legendas para o serviço de voz online da Microsoft.
+
+Para gravar de novo o MP4 e o GIF (precisa do Google Chrome e de `pip install imageio-ffmpeg`):
+
+```bash
+python guia/fonte/record.py guia/index.html gravacao
+python guia/fonte/assemble.py gravacao guia/fonte/audio guia 11 17
+```
+
+O `record.py` grava a página em tempo real (cerca de 5 minutos) com o Chrome sem janela. Os números `11 17` escolhem o trecho do GIF: da 12ª à 17ª legenda, a cena do painel Skins.
 
 ## Créditos
 

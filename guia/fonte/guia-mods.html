@@ -1,0 +1,496 @@
+<title>Guia dos Seus Mods</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a video player (16:9 stage that scales a fixed 960x540 mock of the Code tab), captions and controls under it, then a static command sheet. */
+:root{
+  --bg:#f6f5fb; --surface:#ffffff; --fg:#1d1b26; --muted:#5f5b70; --line:#dedbea; --accent:#6d4fd0; --accent-ink:#ffffff;
+  --f-display:"Familjen Grotesk", "Segoe UI", system-ui, sans-serif;
+  --f-body:"IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", Consolas, "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#15141c; --surface:#1d1c26; --fg:#ecebf3; --muted:#a29fb5; --line:#2e2c3b; --accent:#b49bff; --accent-ink:#17142a; color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#15141c; --surface:#1d1c26; --fg:#ecebf3; --muted:#a29fb5; --line:#2e2c3b; --accent:#b49bff; --accent-ink:#17142a; color-scheme:dark}
+
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.55}
+.wrap{max-width:1000px;margin:0 auto;padding-inline:16px;padding-block:28px 56px;display:flex;flex-direction:column;gap:18px}
+header h1{font-family:var(--f-display);font-weight:700;font-size:clamp(26px,4vw,38px);line-height:1.1;margin:0;text-wrap:balance;letter-spacing:-.01em}
+header p{margin:6px 0 0;color:var(--muted);max-width:62ch}
+
+/* ---- player ---- */
+.player{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.stage{position:relative;width:100%;aspect-ratio:16/9;max-width:100%;background:#0e0e14;overflow:hidden}
+.under{display:flex;flex-direction:column;gap:12px;padding:14px 16px 16px}
+.caption{min-height:3.2em;font-size:16px;line-height:1.5;text-wrap:pretty}
+.caption .sc{display:block;font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:2px}
+.bar{display:flex;gap:4px}
+.seg{flex:1;height:6px;border-radius:3px;background:var(--line);overflow:hidden;cursor:pointer;border:0;padding:0}
+.seg i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+.controls{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.btn{font:inherit;font-size:14px;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:transparent;color:var(--fg);border-radius:8px;padding:7px 12px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn:focus-visible,.seg:focus-visible,.chap:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+.btn svg{width:16px;height:16px}
+.btn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
+.where{margin-left:auto;color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
+.chapters{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px}
+.chap{font:inherit;font-size:13px;text-align:left;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:8px;padding:7px 10px;cursor:pointer;display:flex;gap:8px}
+.chap b{font-family:var(--f-mono);font-weight:600;color:var(--fg);font-variant-numeric:tabular-nums}
+.chap.on{border-color:var(--accent);color:var(--fg)}
+
+/* ---- cheat sheet ---- */
+h2{font-family:var(--f-display);font-size:22px;margin:18px 0 0}
+.sheet{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.sheet section{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;min-width:0}
+.sheet h3{margin:0 0 2px;font-family:var(--f-display);font-size:17px}
+.sheet .where2{margin:0 0 8px;color:var(--muted);font-size:13px}
+.sheet dl{margin:0;display:grid;gap:6px}
+.sheet dt{font-family:var(--f-mono);font-size:13px;color:var(--accent);overflow-wrap:anywhere}
+.sheet dd{margin:0 0 4px;font-size:13.5px}
+.note{color:var(--muted);font-size:13px;margin:0}
+
+/* ======== the mock app (fixed 960x540, scaled) ======== */
+.app{position:absolute;left:0;top:0;width:960px;height:540px;transform-origin:0 0;
+  --m-bg:#282a36;--m-panel:#21222c;--m-line:#3a3c4e;--m-fg:#f8f8f2;--m-muted:#7c86b5;--m-accent:#bd93f9;--m-read:#8be9fd;--m-write:#50fa7b;--m-run:#ffb86c;--m-surface:#343746;--m-zebra:#2d2f3d;--m-ok:#50fa7b;--m-err:#ff5555;
+  background:var(--m-bg);color:var(--m-fg);font-family:var(--f-body);font-size:14px;line-height:1.45;transition:background .5s,color .5s}
+.app *{box-sizing:border-box}
+.tbar{height:34px;display:flex;align-items:center;gap:10px;padding:0 14px;border-bottom:1px solid var(--m-line);font-size:13px;color:var(--m-fg)}
+.tbar .chip{background:var(--m-panel);border:1px solid var(--m-line);border-radius:6px;padding:1px 8px;color:var(--m-muted);font-size:12px}
+.tbar .dots{margin-left:auto;display:flex;gap:6px}.tbar .dots span{width:10px;height:10px;border-radius:50%;background:var(--m-line)}
+.main{display:flex;height:506px}
+.left{flex:1;min-width:0;display:flex;flex-direction:column;padding:12px 22px 8px}
+#chat{flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;gap:7px}
+.msg{font-size:14px}.msg .mk{color:var(--m-accent);font-weight:700;margin-right:6px}
+.msg.cmd{font-family:var(--f-mono);font-size:13px;color:var(--m-fg)}
+.msg.cmd .out{display:block;color:var(--m-muted);font-family:var(--f-body);font-size:13px;margin-left:16px}
+.msg.a{color:var(--m-fg)}
+.tool{font-family:var(--f-mono);font-size:12.5px;color:var(--m-muted);display:flex;gap:8px;align-items:baseline;padding-left:12px;border-left:2px solid var(--m-accent);transition:border-color .5s}
+.tool b{font-weight:600}.tool i{font-style:normal;opacity:.8}
+.add{color:var(--m-ok)}.del{color:var(--m-err)}
+.tb{border-collapse:collapse;font-size:12.5px;margin-left:14px;font-variant-numeric:tabular-nums}
+.tb th{background:var(--m-surface);text-align:left;padding:3px 14px 3px 8px;color:var(--m-fg);transition:background .5s}
+.tb td{padding:2px 14px 2px 8px}.tb tr:nth-child(even) td{background:var(--m-zebra)}
+.tfoot{font-size:12.5px;color:var(--m-muted)}.tfoot .dia{color:var(--m-accent)}
+#band{position:relative;height:84px;margin-top:10px;border-radius:12px;background:var(--m-panel);display:flex;align-items:center;justify-content:flex-end;gap:18px;padding:0 26px}
+#band.off{display:none}
+.sprite{width:64px;height:64px;image-rendering:pixelated;animation:bob 1.6s ease-in-out infinite}
+.sleep .sprite{animation:none;opacity:.55;filter:saturate(.5)}
+@keyframes bob{50%{transform:translateY(-3px)}}
+.lv{display:flex;flex-direction:column;gap:2px;font-size:13px;color:var(--m-muted);min-width:78px}
+.lv .h{color:#ff79c6;letter-spacing:2px}.lv .d{color:#f1fa8c;letter-spacing:2px}
+#bubble{position:absolute;right:120px;top:-26px;background:var(--m-fg);color:#222;border-radius:10px;padding:3px 10px;font-size:13px;font-weight:600;opacity:0;transform:translateY(6px);transition:all .25s;white-space:nowrap}
+#bubble.on{opacity:1;transform:none}
+#prompt{height:42px;margin-top:8px;border:1px solid var(--m-line);border-radius:10px;display:flex;align-items:center;padding:0 14px;font-family:var(--f-mono);font-size:14px;color:var(--m-fg);background:var(--m-panel)}
+#prompt .ph{color:var(--m-muted);font-family:var(--f-body)}
+#prompt .caret{display:inline-block;width:8px;height:17px;background:var(--m-accent);margin-left:2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+#status{height:26px;display:flex;align-items:center;justify-content:flex-end;gap:14px;font-size:12px;color:var(--m-muted)}
+#status b{color:var(--m-fg);font-weight:500}
+.pane{width:0;overflow:hidden;border-left:1px solid transparent;background:var(--m-panel);transition:width .45s ease}
+.pane.open{width:390px;border-left-color:var(--m-line)}
+.pane.instant{transition:none}
+.pin{width:390px;padding:12px 16px;display:flex;flex-direction:column;gap:12px;height:100%}
+.phd{display:flex;justify-content:space-between;align-items:center;font-weight:600}
+.phd .x{color:var(--m-muted);font-weight:400}
+.lab{color:var(--m-muted);margin-right:6px}
+.row{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:13px;align-items:center}
+.sk{display:inline-flex;gap:5px;align-items:center;padding:1px 4px;border-radius:5px}
+.sk b{font-family:var(--f-mono);font-size:10.5px;border:1px solid var(--m-line);border-radius:4px;padding:0 4px;color:var(--m-muted);font-weight:400}
+.sk.on{color:var(--m-accent);font-weight:600}
+.sk.hit{background:var(--m-surface)}
+.prev{border:1px solid var(--m-line);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:6px}
+.prev .tool{padding-left:8px}
+.tg{font-size:12.5px}.tg b{font-family:var(--f-mono);font-size:10.5px;border:1px solid var(--m-line);border-radius:4px;padding:0 4px;color:var(--m-muted);font-weight:400;margin-right:3px}
+.sw{display:inline-block;width:4px;height:13px;margin-right:4px;vertical-align:-2px}
+.colrow{display:flex;gap:8px;align-items:center;font-size:13px}
+.sel{border:1px solid var(--m-line);border-radius:6px;padding:2px 8px}
+#hexIn{flex:1;border:1px solid var(--m-line);border-radius:6px;padding:3px 8px;font-family:var(--f-mono);font-size:12.5px;min-height:24px;color:var(--m-fg)}
+#hexIn:empty::before{content:"#rrggbb";color:var(--m-muted)}
+.paint{background:var(--m-surface);border-radius:6px;padding:3px 10px;transition:transform .15s}
+.paint.press{transform:scale(.92);background:var(--m-accent);color:#222}
+.pfoot{margin-top:auto;color:var(--m-muted);font-size:12.5px}
+/* flightdeck */
+.fd h4{margin:0 0 4px;font-size:11px;letter-spacing:.1em;color:var(--m-muted);font-weight:600}
+.fd .blk{border:1px solid var(--m-line);border-radius:9px;padding:8px 10px;font-size:12.5px}
+.gauge{height:7px;border-radius:4px;background:var(--m-surface);overflow:hidden;margin:4px 0}
+.gauge i{display:block;height:100%;width:12%;background:var(--m-accent)}
+.cards{display:flex;gap:6px}.cards div{flex:1;border:1px solid var(--m-line);border-radius:7px;padding:5px 7px;font-size:11.5px}
+.cards .p{height:4px;background:var(--m-surface);border-radius:2px;margin-top:4px;overflow:hidden}.cards .p i{display:block;height:100%;background:var(--m-run)}
+/* mod store */
+.search{border:1px solid var(--m-line);border-radius:7px;padding:4px 10px;font-size:13px;color:var(--m-muted)}
+.mods{display:flex;flex-direction:column;gap:6px}
+.mod{border:1px solid var(--m-line);border-radius:8px;padding:6px 10px;font-size:12.5px;display:flex;justify-content:space-between;gap:8px;align-items:center}
+.mod.sel2{border-color:var(--m-accent)}
+.mod small{display:block;color:var(--m-muted)}
+.badge{font-size:11px;border-radius:999px;padding:1px 8px;white-space:nowrap;font-weight:600}
+.b-ok{background:#1f4d33;color:#7ff0a8}.b-net{background:#5a2328;color:#ffb3b8}.b-run{background:#544018;color:#ffd58a}
+.inst{font-size:12px;color:var(--m-muted)}.inst b{color:var(--m-fg)}
+/* overlays */
+#hl{position:absolute;border:2px solid #ffd166;border-radius:10px;box-shadow:0 0 0 2000px rgba(8,8,14,.5);pointer-events:none;opacity:0;transition:all .45s ease;z-index:5}
+#keycap{position:absolute;left:50%;bottom:96px;transform:translate(-50%,10px);background:#f2f2f7;color:#16161d;font-family:var(--f-mono);font-weight:600;font-size:20px;border-radius:9px;padding:6px 16px;box-shadow:0 4px 0 #9a9aa8;opacity:0;transition:all .2s;z-index:6}
+#keycap.on{opacity:1;transform:translate(-50%,0)}
+#card{position:absolute;inset:0;z-index:4;background:#14131b;color:#ecebf3;display:none;flex-direction:column;justify-content:center;padding:40px 56px;gap:22px}
+#card.on{display:flex}
+#card h2{font-family:var(--f-display);font-size:40px;margin:0;line-height:1.05;color:#fff}
+#card .sub{color:#a29fb5;font-size:17px;margin:-8px 0 0}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.tile{border:1px solid #2e2c3b;border-radius:12px;padding:14px;background:#1b1a24}
+.tile .k{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;color:#b49bff;text-transform:uppercase}
+.tile h3{margin:4px 0 4px;font-family:var(--f-display);font-size:21px;color:#fff}
+.tile p{margin:0;color:#b9b6c9;font-size:13.5px}
+.tline{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.tline code,.cmdgrid code{font-family:var(--f-mono);color:#b49bff;font-size:13px}
+.cmdgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;font-size:12.5px;color:#cfccdc}
+.cmdgrid div{display:flex;flex-direction:column;gap:3px}
+.cmdgrid h4{margin:0 0 4px;font-family:var(--f-display);font-size:17px;color:#fff}
+.bigplay{position:absolute;inset:0;z-index:7;display:flex;align-items:center;justify-content:center;background:rgba(10,10,16,.35);border:0;cursor:pointer;width:100%;padding:0}
+.bigplay span{width:84px;height:84px;border-radius:50%;background:#b49bff;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+.bigplay svg{width:34px;height:34px;margin-left:5px}
+@media (prefers-reduced-motion: reduce){.sprite,#prompt .caret{animation:none}.pane,#hl,.app,.seg i{transition:none}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Como usar seus mods no dia a dia</h1>
+    <p>Um vídeo animado de cerca de 6 minutos. Ele simula a tela do Claude Code e mostra quando o painel lateral abre, como trocar de skin, como cuidar do Pokémon, o flightdeck e a Mod Store. A narração em português começa junto com o play. O botão Narração desliga o som.</p>
+  </header>
+
+  <div class="player">
+    <div class="stage" id="stage">
+      <div class="app" id="app">
+        <div class="tbar"><span>Mods para uso diário</span><span class="chip">Nova pasta</span><span class="dots"><span></span><span></span><span></span></span></div>
+        <div class="main">
+          <div class="left">
+            <div id="chat"></div>
+            <div id="band">
+              <div id="bubble"></div>
+              <canvas class="sprite" id="sprite" width="12" height="12"></canvas>
+              <div class="lv"><span id="lvl">Lv 5</span><span class="d" id="food">●●●●○</span><span class="h" id="love">♥♥♥♥♡</span></div>
+            </div>
+            <div id="prompt"></div>
+            <div id="status"><span id="fdline">flightdeck &nbsp;ctx <b>12%</b></span><span><b>Opus 5.5</b></span><span>Médio</span></div>
+          </div>
+          <div class="pane" id="pane"><div class="pin" id="pin"></div></div>
+        </div>
+        <div id="card"></div>
+        <div id="hl"></div>
+        <div id="keycap"></div>
+      </div>
+      <button class="bigplay" id="bigplay" aria-label="Reproduzir"><span><svg viewBox="0 0 24 24" fill="#17142a"><path d="M6 4l14 8-14 8z"/></svg></span></button>
+    </div>
+    <div class="under">
+      <div class="caption" id="caption" aria-live="polite"><span class="sc" id="capsc">Cena 1</span><span id="captext">Aperte play para começar.</span></div>
+      <div class="bar" id="bar"></div>
+      <div class="controls">
+        <button class="btn" id="prev" aria-label="Cena anterior"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg></button>
+        <button class="btn primary" id="play"><svg id="playic" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4l14 8-14 8z"/></svg><span id="playlbl">Reproduzir</span></button>
+        <button class="btn" id="next" aria-label="Próxima cena"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 5h2v14h-2zM4 5v14l11-7z"/></svg></button>
+        <button class="btn" id="narr" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 9a4 4 0 010 6M18.5 6.5a8 8 0 010 11"/></svg><span id="narrlbl">Narração desligada</span></button>
+        <span class="where" id="where">Cena 1 de 10</span>
+      </div>
+      <div class="chapters" id="chapters"></div>
+    </div>
+  </div>
+
+  <h2>Cola de comandos</h2>
+  <div class="sheet">
+    <section><h3>Skins</h3><p class="where2">Visual da conversa. Painel lateral com <code>/skin</code>.</p><dl>
+      <dt>/skin</dt><dd>Abre o painel: números trocam o tema, letras ligam e desligam partes, Esc fecha.</dd>
+      <dt>/skin dracula</dt><dd>Troca o tema direto, sem abrir o painel.</dd>
+      <dt>/skin list</dt><dd>Lista todos os temas, inclusive os seus.</dd>
+      <dt>/skin band off</dt><dd>Liga ou desliga uma parte (rail, band, tables, shimmer…).</dd>
+      <dt>/skin off</dt><dd>Volta ao visual original do Claude Code.</dd></dl></section>
+    <section><h3>Pokémon</h3><p class="where2">Faixa acima da caixa de mensagem.</p><dl>
+      <dt>/pokemon charmander</dt><dd>Troca o Pokémon da tela.</dd>
+      <dt>/pokemon list</dt><dd>Mostra todos os nomes.</dd>
+      <dt>/pokemon pet · /pokemon feed</dt><dd>Carinho e comida. Mantêm as barrinhas cheias.</dd>
+      <dt>/pokemon stats</dt><dd>Nível, XP e evolução.</dd>
+      <dt>/pokemon sleep</dt><dd>Põe para dormir. Rode de novo para acordar.</dd></dl></section>
+    <section><h3>Flightdeck</h3><p class="where2">Linha de status e painel lateral.</p><dl>
+      <dt>/flightdeck</dt><dd>Abre o painel de contexto, custo, permissões e subagentes.</dd>
+      <dt>/flightdeck layout mini</dt><dd>Versão compacta. Outros: auto, compact, wide.</dd>
+      <dt>/flightdeck close</dt><dd>Fecha o painel.</dd>
+      <dt>/flightdeck reset</dt><dd>Zera contadores e log.</dd></dl></section>
+    <section><h3>Mod Store</h3><p class="where2">Loja de mods no painel lateral.</p><dl>
+      <dt>/mods</dt><dd>Abre a loja com busca e filtros.</dd>
+      <dt>i, depois y</dt><dd>Instala o mod aberto e confirma.</dd>
+      <dt>b</dt><dd>Volta para a lista.</dd></dl></section>
+  </div>
+  <p class="note">As telas do vídeo são uma simulação para explicar o uso. Cores, textos e números reais podem variar um pouco na sua tela.</p>
+</div>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+const app=$('#app'), stage=$('#stage'), chatEl=$('#chat'), promptEl=$('#prompt'), pane=$('#pane'), pin=$('#pin'),
+      hlEl=$('#hl'), keyEl=$('#keycap'), cardEl=$('#card'), bubble=$('#bubble'), band=$('#band');
+let scale=1;
+function fit(){scale=stage.clientWidth/960;app.style.transform='scale('+scale+')'}
+new ResizeObserver(fit).observe(stage);fit();
+
+/* ---------- skins (approximate palettes for the mock) ---------- */
+const SK={
+ dracula:{bg:'#282a36',panel:'#21222c',line:'#3a3c4e',fg:'#f8f8f2',muted:'#7c86b5',accent:'#bd93f9',read:'#8be9fd',write:'#50fa7b',run:'#ffb86c',surface:'#343746',zebra:'#2d2f3d'},
+ nord:{bg:'#2e3440',panel:'#29303b',line:'#434c5e',fg:'#eceff4',muted:'#8590a6',accent:'#88c0d0',read:'#81a1c1',write:'#a3be8c',run:'#ebcb8b',surface:'#3b4252',zebra:'#343b48'},
+ noir:{bg:'#121212',panel:'#181818',line:'#2a2a2a',fg:'#ededed',muted:'#8c8c8c',accent:'#f5f5f5',read:'#ededed',write:'#ededed',run:'#ededed',surface:'#1c1c1c',zebra:'#171717'},
+ plain:{bg:'#1e1e1e',panel:'#1a1a1a',line:'#333',fg:'#e6e6e6',muted:'#8a8a8a',accent:'#d97757',read:'#e6e6e6',write:'#e6e6e6',run:'#e6e6e6',surface:'#1e1e1e',zebra:'#1e1e1e'}
+};
+const SKLIST=['noir','tokyo-night','dracula','nord','gruvbox','catppuccin','rose-pine','everforest','one-dark','solarized','github','kanagawa','ayu','night-owl','mono'];
+let curSkin='dracula';
+function setSkin(n){curSkin=n;const p=SK[n]||SK.dracula;for(const k in p)app.style.setProperty('--m-'+k,p[k]);if(paneKind==='skin')renderPane('skin')}
+function setVar(k,v){app.style.setProperty('--m-'+k,v)}
+
+/* ---------- pokémon sprites ---------- */
+const MON={
+ pikachu:{pal:{Y:'#f7d02c',K:'#1b1b1b',R:'#e8483f',B:'#8a5a1b'},map:[
+  'K..........K','YK........KY','YY........YY','.YYYYYYYYYY.','.YYYYYYYYYY.','YYKYYYYYYKYY','YYKYYYYYYKYY','RRYYYKKYYYRR','RRYYYYYYYYRR','.YYYYYYYYYY.','..YYY..YYY..','..BB....BB..']},
+ charmander:{pal:{O:'#f08a2c',Y:'#f7d77a',K:'#1b1b1b',F:'#ff4d2e',G:'#ffd23f'},map:[
+  '...OOOO.....','..OOOOOO....','..OKOOKO....','..OOOOOO....','...OOOO...G.','..OOYYOO..FG','.OOOYYOOO.F.','O.OOYYOO.OO.','..OOYYOOOO..','..OOOOOO....','..OO..OO....','.OOO..OOO...']}
+};
+const ctx2=$('#sprite').getContext('2d');
+function setMon(n){const m=MON[n];ctx2.clearRect(0,0,12,12);m.map.forEach((r,y)=>[...r].forEach((c,x)=>{if(m.pal[c]){ctx2.fillStyle=m.pal[c];ctx2.fillRect(x,y,1,1)}}))}
+function say(t){bubble.textContent=t;bubble.classList.toggle('on',!!t)}
+
+/* ---------- transcript ---------- */
+function baseChat(){return `
+ <div class="msg"><span class="mk">›</span>adicione validação de frequência no formulário da turma</div>
+ <div class="tool"><b style="color:var(--m-read)">Read</b>src/frequencia.ts<i>40ms</i></div>
+ <div class="tool"><b style="color:var(--m-write)">Edit</b>src/frequencia.ts<span class="add">+12</span><span class="del">−3</span><i>310ms</i></div>
+ <div class="tool"><b style="color:var(--m-run)">Bash</b>npm test<i>2.1s</i></div>
+ <table class="tb"><tr><th>Turma</th><th>Alunos</th><th>Frequência</th></tr><tr><td>6º A</td><td>32</td><td>94%</td></tr><tr><td>6º B</td><td>30</td><td>91%</td></tr><tr><td>7º A</td><td>31</td><td>88%</td></tr></table>
+ <div class="tfoot"><span class="dia">◆</span> Done in 38s · 3 tools · <span class="add">+12</span> <span class="del">−3</span></div>`}
+function addChat(html){chatEl.insertAdjacentHTML('beforeend',html)}
+function setPrompt(t,typing){promptEl.innerHTML=t?esc(t)+(typing?'<span class="caret"></span>':''):'<span class="ph">Escreva uma mensagem…</span>'}
+function esc(s){return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
+
+/* ---------- panes ---------- */
+let paneKind=null, paneOpt={};
+function renderPane(kind){
+ if(kind==='skin'){
+  pin.innerHTML=`<div class="phd">Skins <span class="x">✕</span></div>
+  <div class="row" id="sk-list"><span class="lab">Skin</span>${SKLIST.map((n,i)=>`<span class="sk ${n===curSkin?'on':''}" data-n="${n}">${i<9?`<b>${i+1}</b>`:''}${n}${n===curSkin?' ●':''}</span>`).join('')}</div>
+  <div class="prev" id="sk-prev">
+   <div class="msg" style="font-size:13px"><span class="mk">›</span>gerar relatório mensal</div>
+   <div class="tool"><b style="color:var(--m-run)">Bash</b>npm run build<i>1.8s</i></div>
+   <div class="tool"><b style="color:var(--m-write)">Edit</b>relatorio.ts<span class="add">+18</span><span class="del">−3</span></div>
+   <div class="tool"><b style="color:var(--m-read)">Read</b>2 arquivos</div>
+   <div class="tfoot"><span class="dia">◆</span> Done in 41s · 6 tools</div></div>
+  <div class="row" id="sk-look"><span class="lab">Look</span>
+   <span class="tg"><b>R</b>rail ●</span><span class="tg"><b>T</b>tables on</span><span class="tg"><b>S</b>shimmer ●</span><span class="tg" id="tg-b"><b>B</b>band ○</span><span class="tg"><b>M</b>markdown ●</span><span class="tg"><b>C</b>clip ○</span><span class="tg"><b>G</b>charts ●</span></div>
+  <div class="row" id="sk-slots"><span class="sw" style="background:var(--m-accent)"></span>user <span class="sw" style="background:var(--m-fg)"></span>fg <span class="sw" style="background:var(--m-muted)"></span>muted <span class="sw" style="background:var(--m-read)"></span>read <span class="sw" style="background:var(--m-write)"></span>write <span class="sw" style="background:var(--m-run)"></span>run</div>
+  <div class="colrow" id="sk-col"><span class="lab">Colour</span><span class="sel">user ⌄</span><span id="hexIn"></span><span class="paint" id="paint">paint</span></div>
+  <div class="pfoot">Ou peça ao Claude: “faz um tema com cara de pôr do sol”. Esc fecha.</div>`;
+ } else if(kind==='fd'){
+  if(paneOpt.mini){pin.innerHTML=`<div class="phd">FLIGHTDECK <span class="x">mini</span></div>
+   <div class="fd"><div class="blk" id="fd-mini">Opus 5.5 · ctx 12% <div class="gauge"><i></i></div>$0.84 nesta sessão · ARQUITETO 0 consultas</div></div>
+   <div class="pfoot">/flightdeck layout auto volta ao painel completo.</div>`;return}
+  pin.innerHTML=`<div class="phd">FLIGHTDECK <span class="x">✕</span></div>
+  <div class="fd" style="display:flex;flex-direction:column;gap:9px">
+   <div class="blk" id="fd-main"><h4>MAIN</h4>Opus 5.5 · effort médio<div class="gauge"><i></i></div>ctx 12% · $0.84 nesta sessão</div>
+   <div class="blk" id="fd-arch"><h4>ARQUITETO</h4>not consulted yet</div>
+   <div class="blk" id="fd-gate"><h4>PERMISSÕES</h4>14 checks · 12 permitidos · 2 perguntados a você</div>
+   <div class="blk" id="fd-agents"><h4>AGENTS</h4><div class="cards"><div>Explore<br><span style="color:var(--m-muted)">lendo src/</span><div class="p"><i style="width:70%"></i></div></div><div>general<br><span style="color:var(--m-muted)">testes</span><div class="p"><i style="width:35%"></i></div></div></div></div>
+   <div class="blk" id="fd-log"><h4>LOG</h4><span style="color:var(--m-muted)">14:02 Edit frequencia.ts<br>14:03 Bash npm test ✓</span></div>
+  </div>`;
+ } else if(kind==='mods'){
+  const sel=paneOpt.sel;
+  if(paneOpt.detail){pin.innerHTML=`<div class="phd">Mod Store <span class="x">b: voltar</span></div>
+   <div class="blk" style="border:1px solid var(--m-line);border-radius:9px;padding:10px;font-size:13px" id="md-detail">
+    <div style="font-weight:600;font-size:15px">human-in-the-loop</div>
+    <div style="color:var(--m-muted);margin:4px 0 8px">Claude passa para você as tarefas que só você pode fazer.</div>
+    <span class="badge b-ok">Só exibe</span>
+    <div style="margin-top:10px;color:var(--m-muted)">Pode ler: nada fora do mod · Aparece em: painel e status</div></div>
+   <div class="inst" id="md-inst">${paneOpt.confirm?'Instalar com <b>claude plugin install</b>? <b>y</b> confirma · <b>n</b> cancela':'<b>i</b> instalar · <b>b</b> voltar'}</div>`;return}
+  pin.innerHTML=`<div class="phd">Mod Store <span class="x">✕</span></div>
+  <div class="search" id="md-search">⌕ ${paneOpt.q||'buscar entre ~2.700 mods'}</div>
+  <div class="mods" id="md-list">
+   <div class="mod ${sel===0?'sel2':''}" id="md-0"><div>human-in-the-loop<small>tarefas para você num painel</small></div><span class="badge b-ok">Só exibe</span></div>
+   <div class="mod" id="md-1"><div>flightdeck<small>instalado · contexto e custo</small></div><span class="badge b-ok">Só exibe</span></div>
+   <div class="mod" id="md-2"><div>pokemon<small>instalado · companheiro</small></div><span class="badge b-net">Rede</span></div>
+   <div class="mod" id="md-3"><div>prismantis<small>instalado · gráficos e tabelas</small></div><span class="badge b-run">Executa programas</span></div>
+  </div>
+  <div class="pfoot">Tab e setas navegam · Enter abre</div>`;
+ }
+}
+function openPane(kind,opt,instant){paneKind=kind;paneOpt=opt||{};renderPane(kind);pane.classList.toggle('instant',!!instant);pane.classList.add('open');if(instant)void pane.offsetWidth;pane.classList.remove('instant')}
+function closePane(instant){paneKind=null;pane.classList.toggle('instant',!!instant);pane.classList.remove('open');if(instant){void pane.offsetWidth;pane.classList.remove('instant')}}
+
+/* ---------- overlays ---------- */
+function hl(target,pad){pad=pad??6;const el=typeof target==='string'?app.querySelector(target):target;if(!el){hlEl.style.opacity=0;return}
+ const a=app.getBoundingClientRect(),r=el.getBoundingClientRect();
+ Object.assign(hlEl.style,{left:((r.left-a.left)/scale-pad)+'px',top:((r.top-a.top)/scale-pad)+'px',width:(r.width/scale+pad*2)+'px',height:(r.height/scale+pad*2)+'px',opacity:1})}
+function unhl(){hlEl.style.opacity=0}
+function card(html){cardEl.innerHTML=html;cardEl.classList.add('on')}
+function uncard(){cardEl.classList.remove('on')}
+
+/* ---------- timing engine ---------- */
+let gen=0, paused=true, running=false, narr=true, cur={s:0,i:0};
+class Cancel{}
+function sleep(ms,g){return new Promise((res,rej)=>{let left=ms,last=performance.now();(function t(){if(g!==gen)return rej(new Cancel());const n=performance.now();if(!paused)left-=n-last;last=n;if(left<=0)return res();setTimeout(t,40)})()})}
+function waitUnpaused(g){return sleep(0,g)}
+function mk(g){const w=ms=>sleep(ms,g);return{w,
+ async type(t){for(let k=1;k<=t.length;k++){setPrompt(t.slice(0,k),true);await w(55)}await w(350);await this.key('Enter');setPrompt('');addChat(`<div class="msg cmd"><span class="mk">›</span>${esc(t)}</div>`)},
+ async key(k){keyEl.textContent=k;keyEl.classList.add('on');await w(650);keyEl.classList.remove('on');await w(150)}
+}}
+/* narration: one pre-recorded mp3 per caption, n = caption order */
+const AUDIO=[/*AUDIO*/];
+let audio=null, audioDone=null;
+function speak(n){stopSpeech();if(!narr||!AUDIO[n])return Promise.resolve();
+ return new Promise(r=>{const a=new Audio('data:audio/mpeg;base64,'+AUDIO[n]);audio=a;audioDone=r;
+  a.onended=a.onerror=()=>{if(audio===a)audio=null;r()};
+  a.play().catch(()=>{});})}
+function stopSpeech(){if(audio){audio.pause();audio=null}if(audioDone){audioDone();audioDone=null}}
+function pauseSpeech(){if(audio)audio.pause()}
+function resumeSpeech(){if(audio)audio.play().catch(()=>{})}
+
+/* ---------- scenes ---------- */
+const S=[];
+function scene(title,setup,steps){S.push({title,setup,steps})}
+function reset(o){o=o||{};uncard();unhl();setSkin(o.skin||'dracula');setMon(o.mon||'pikachu');say('');app.classList.remove('sleep');band.classList.remove('sleep');
+ $('#love').textContent='♥♥♥♥♡';$('#food').textContent='●●●●○';$('#lvl').textContent='Lv 5';
+ closePane(true);setPrompt('');chatEl.innerHTML=o.chat===false?'':baseChat();if(o.pane)openPane(o.pane,o.opt,true);if(o.card)card(o.card)}
+
+const tiles=`<h2>Seus quatro mods</h2><p class="sub">Cada um aparece num lugar diferente da tela.</p><div class="tiles">
+ <div class="tile" id="t-skin"><div class="k">Visual</div><h3>Skins</h3><p>Cores, ícones e tabelas da conversa. Tema atual: dracula.</p></div>
+ <div class="tile" id="t-fd"><div class="k">Painel</div><h3>Flightdeck</h3><p>Contexto usado, custo, permissões e subagentes.</p></div>
+ <div class="tile" id="t-pk"><div class="k">Companheiro</div><h3>Pokémon</h3><p>Fica acima da caixa de mensagem e reage ao trabalho.</p></div>
+ <div class="tile" id="t-ms"><div class="k">Loja</div><h3>Mod Store</h3><p>Procura e instala novos mods com segurança.</p></div></div>`;
+
+scene('Seus quatro mods',()=>reset({card:tiles}),[
+ ['Você instalou quatro mods. Cada um aparece num lugar diferente da tela do Claude Code.',null,1500],
+ ['Skins muda o visual da conversa.',async c=>{hl('#t-skin')},1400],
+ ['Flightdeck mostra quanto do contexto você já usou e quanto a sessão custou.',async c=>{hl('#t-fd')},1400],
+ ['O Pokémon é um companheiro que fica acima da caixa de mensagem.',async c=>{hl('#t-pk')},1400],
+ ['E a Mod Store serve para achar e instalar novos mods.',async c=>{hl('#t-ms')},1400],
+ ['Vamos ver onde cada um aparece.',async c=>{unhl()},900]
+]);
+
+scene('Onde cada um aparece',()=>reset({}),[
+ ['Esta é a tela do Claude Code. À esquerda fica a conversa. O skins pinta essa área: a cor de cada ferramenta, as tabelas e o rodapé de cada resposta.',async c=>{hl('#chat',4)},1800],
+ ['Logo acima da caixa de mensagem fica a faixa do Pokémon.',async c=>{hl('#band',4)},1400],
+ ['Embaixo, na linha de status, o flightdeck mostra o contexto usado. Ela fica sempre ali.',async c=>{hl('#fdline',5)},1500],
+ ['O lado direito é o painel lateral. Ele não fica aberto sozinho: aparece quando você digita um comando como barra skin, barra flightdeck ou barra mods.',async c=>{unhl();await c.w(300);openPane('skin');await c.w(600);hl('#pane',0)},2000],
+ ['Para fechar o painel, aperte Esc ou clique no X. A conversa volta a ocupar a tela toda.',async c=>{await c.key('Esc');closePane();unhl()},1400]
+]);
+
+scene('Trocar de skin pelo painel',()=>reset({}),[
+ ['Para trocar de skin, digite barra skin e aperte Enter.',async c=>{await c.type('/skin');openPane('skin');await c.w(500)},900],
+ ['O painel Skins abre à direita. No topo estão os temas. O ponto mostra o tema atual, que é o dracula.',async c=>{hl('#sk-list',4)},1600],
+ ['Cada tema tem um número. Aperte o número para experimentar. Com 4, tudo vira nord na hora, inclusive a conversa à esquerda.',async c=>{await c.key('4');setSkin('nord');hl('#sk-list',4)},2000],
+ ['A caixa do meio é uma prévia de como fica uma resposta com o tema escolhido.',async c=>{hl('#sk-prev',4)},1500],
+ ['Preferiu o anterior? Aperte 3 e volta para o dracula.',async c=>{await c.key('3');setSkin('dracula');hl('#sk-list',4)},1400],
+ ['Quando terminar, aperte Esc. O tema escolhido continua valendo nas próximas sessões.',async c=>{unhl();await c.key('Esc');closePane()},1400]
+]);
+
+scene('Comandos rápidos do skin',()=>reset({}),[
+ ['Se você já sabe o nome do tema, não precisa abrir o painel. Digite barra skin e o nome.',async c=>{await c.type('/skin nord');setSkin('nord')},1500],
+ ['Barra skin list mostra todos os temas, inclusive os que você criar.',async c=>{await c.type('/skin list');addChat(`<div class="msg cmd"><span class="out">noir · tokyo-night · dracula · nord · gruvbox · catppuccin · rose-pine · …</span></div>`)},1600],
+ ['Para ligar ou desligar uma parte, use barra skin, o nome da parte e on ou off. Foi assim que tiramos a barra de uso.',async c=>{await c.type('/skin band off')},1600],
+ ['E barra skin off volta ao visual original do Claude Code, sem desinstalar nada.',async c=>{await c.type('/skin off');setSkin('plain')},1500],
+ ['Para voltar ao seu tema, barra skin dracula.',async c=>{await c.type('/skin dracula');setSkin('dracula')},1200]
+]);
+
+scene('Pintar uma cor',()=>reset({pane:'skin'}),[
+ ['Dentro do painel, a linha Look tem as partes do skin. Cada letra liga ou desliga uma: R é o rail, T são as tabelas, B é a faixa de uso.',async c=>{hl('#sk-look',4)},2000],
+ ['A linha de baixo mostra o que cada cor pinta. User é a cor de destaque: a linha ao lado das ferramentas, o marcador das suas mensagens e o spinner.',async c=>{hl('#sk-slots',4)},2000],
+ ['Em Colour, escolha a cor, digite o código hex e clique em paint.',async c=>{hl('#sk-col',4);const t='#ff79c6',el=$('#hexIn');for(let k=1;k<=t.length;k++){el.textContent=t.slice(0,k);await c.w(90)}await c.w(300);const p=$('#paint');p.classList.add('press');await c.w(250);p.classList.remove('press');setVar('accent','#ff79c6')},1600],
+ ['O destaque ficou rosa na hora. Se preferir, peça para mim: faz um tema com cara de pôr do sol. Eu crio e aplico.',async c=>{unhl();addChat(`<div class="msg"><span class="mk">›</span>faz um tema com cara de pôr do sol</div>`)},1800]
+]);
+
+scene('Seu Pokémon',()=>reset({}),[
+ ['O Pokémon reage ao que eu faço. Uma lupa quando leio arquivos,',async c=>{hl('#band',4);say('🔎');await c.w(900)},600],
+ ['um lápis quando edito, e um ponto de exclamação quando preciso de você.',async c=>{say('✏️');await c.w(1100);say('❗')},1000],
+ ['Para trocar de Pokémon, digite barra pokemon e o nome. Por exemplo, charmander.',async c=>{say('');unhl();await c.type('/pokemon charmander');setMon('charmander');hl('#band',4)},1600],
+ ['Não lembra o nome? Barra pokemon list mostra os 151 da primeira geração.',async c=>{unhl();await c.type('/pokemon list')},1300],
+ ['Ele sente fome e saudade. Pet faz carinho e feed dá uma berry.',async c=>{await c.type('/pokemon pet');say('♥');$('#love').textContent='♥♥♥♥♥';hl('#band',4);await c.w(900);unhl();await c.type('/pokemon feed');say('🫐');$('#food').textContent='●●●●●';hl('#band',4)},1300],
+ ['Barra pokemon stats mostra o nível, a experiência e quando ele evolui. Cada resposta minha dá experiência.',async c=>{say('Lv 5 · 62/100 XP');await c.w(400)},1700],
+ ['Vai ficar um tempo fora? Barra pokemon sleep põe para dormir e as barras caem mais devagar. Rode de novo para acordar.',async c=>{say('');unhl();await c.type('/pokemon sleep');band.classList.add('sleep');say('z z z');hl('#band',4)},1800]
+]);
+
+scene('Flightdeck',()=>reset({}),[
+ ['A linha de status mostra sempre o contexto usado. Não precisa fazer nada para ver.',async c=>{hl('#fdline',5)},1500],
+ ['Para ver os detalhes, digite barra flightdeck. O painel abre à direita.',async c=>{unhl();await c.type('/flightdeck');openPane('fd');await c.w(500)},900],
+ ['No topo, o modelo, a barra de contexto e o custo da sessão.',async c=>{hl('#fd-main',4)},1400],
+ ['Depois, as permissões: quantas ações foram checadas e quantas pediram sua aprovação.',async c=>{hl('#fd-gate',4)},1500],
+ ['Quando eu uso subagentes, cada um vira um cartão com o progresso.',async c=>{hl('#fd-agents',4)},1500],
+ ['Prefere algo menor? Barra flightdeck layout mini deixa só o essencial.',async c=>{unhl();await c.type('/flightdeck layout mini');paneOpt={mini:true};renderPane('fd');await c.w(300);hl('#fd-mini',4)},1500],
+ ['Barra flightdeck close fecha o painel. Dica: quando o contexto passar de uns 70 por cento, rode barra compact para resumir a conversa.',async c=>{unhl();await c.type('/flightdeck close');closePane()},2000]
+]);
+
+scene('Mod Store',()=>reset({}),[
+ ['Para procurar novos mods, digite barra mods. A loja abre no painel lateral.',async c=>{await c.type('/mods');openPane('mods');await c.w(500);hl('#md-search',4)},1300],
+ ['Cada mod tem uma etiqueta de acesso. Verde só desenha na tela. Vermelho usa a internet. Prefira os verdes.',async c=>{hl('#md-list',4)},2000],
+ ['Use as setas e Enter para abrir um mod e ver o que ele pode acessar.',async c=>{unhl();paneOpt={sel:0};renderPane('mods');await c.w(500);await c.key('Enter');paneOpt={detail:true};renderPane('mods');hl('#md-detail',4)},1500],
+ ['Para instalar, aperte i e confirme com y. Nada é instalado sem a sua confirmação.',async c=>{await c.key('i');paneOpt={detail:true,confirm:true};renderPane('mods');hl('#md-inst',4);await c.w(700);await c.key('y')},1500],
+ ['Ou me peça: acha um mod que mostre minhas tarefas. Eu busco e comparo, mas quem aperta instalar é você.',async c=>{unhl();closePane();addChat(`<div class="msg"><span class="mk">›</span>acha um mod que mostre minhas tarefas</div>`)},1800]
+]);
+
+scene('Rotina do dia a dia',()=>reset({card:`<h2>Rotina do dia a dia</h2><p class="sub">O que fazer e quando.</p><div class="tline">
+ <div class="tile" id="r1"><div class="k">Ao abrir a sessão</div><h3>Nada obrigatório</h3><p>O status mostra o contexto. Se quiser, <code>/flightdeck layout mini</code>.</p></div>
+ <div class="tile" id="r2"><div class="k">Durante o trabalho</div><h3>Só olhe</h3><p>O Pokémon avisa com <code>!</code> quando preciso de você. Contexto alto? <code>/compact</code>.</p></div>
+ <div class="tile" id="r3"><div class="k">De vez em quando</div><h3>Cuide e explore</h3><p><code>/pokemon feed</code>, <code>/skin</code> para mudar o visual, <code>/mods</code> para novidades.</p></div></div>`}),[
+ ['Ao abrir uma sessão, você não precisa fazer nada. A linha de status já mostra o contexto.',async c=>{hl('#r1')},1500],
+ ['Durante o trabalho, só olhe. O Pokémon mostra um ponto de exclamação quando eu preciso de você.',async c=>{hl('#r2')},1500],
+ ['De vez em quando, alimente o Pokémon, mude o visual com barra skin ou procure novidades com barra mods.',async c=>{hl('#r3')},1600]
+]);
+
+scene('Cola de comandos',()=>reset({card:`<h2>Cola de comandos</h2><div class="cmdgrid">
+ <div><h4>Skins</h4><code>/skin</code><code>/skin dracula</code><code>/skin list</code><code>/skin band off</code><code>/skin off</code></div>
+ <div><h4>Pokémon</h4><code>/pokemon charmander</code><code>/pokemon list</code><code>/pokemon pet</code><code>/pokemon feed</code><code>/pokemon stats</code><code>/pokemon sleep</code></div>
+ <div><h4>Flightdeck</h4><code>/flightdeck</code><code>/flightdeck layout mini</code><code>/flightdeck close</code><code>/flightdeck reset</code></div>
+ <div><h4>Mod Store</h4><code>/mods</code><code>i, depois y</code><code>b para voltar</code><h4 style="margin-top:10px">Painel</h4><code>Esc fecha</code></div></div>`}),[
+ ['Esta é a cola com todos os comandos. Ela também está logo abaixo do vídeo, para consultar quando quiser.',null,2500],
+ ['Fim. Bom trabalho com seus mods.',null,1500]
+]);
+
+/* ---------- player ---------- */
+{let off=0;S.forEach(s=>{s.off=off;off+=s.steps.length})}
+const bar=$('#bar'),chaps=$('#chapters');
+S.forEach((s,i)=>{const b=document.createElement('button');b.className='seg';b.setAttribute('aria-label','Cena '+(i+1)+': '+s.title);b.innerHTML='<i></i>';b.onclick=()=>go(i);bar.appendChild(b);
+ const c=document.createElement('button');c.className='chap';c.innerHTML='<b>'+String(i+1).padStart(2,'0')+'</b>'+s.title;c.onclick=()=>go(i);chaps.appendChild(c)});
+function ui(){
+ [...bar.children].forEach((b,i)=>b.firstChild.style.width=(i<cur.s?100:i>cur.s?0:Math.round(100*(cur.i+1)/S[i].steps.length))+'%');
+ [...chaps.children].forEach((c,i)=>c.classList.toggle('on',i===cur.s));
+ $('#where').textContent='Cena '+(cur.s+1)+' de '+S.length+' · '+S[cur.s].title;
+ $('#playlbl').textContent=paused?'Reproduzir':'Pausar';
+ $('#playic').innerHTML=paused?'<path d="M6 4l14 8-14 8z"/>':'<path d="M6 4h4v16H6zM14 4h4v16h-4z"/>';
+ $('#bigplay').hidden=!paused||running&&cur.i>0;
+}
+function caption(t){$('#capsc').textContent='Cena '+(cur.s+1)+' · '+S[cur.s].title;$('#captext').textContent=t}
+async function run(from){
+ const g=++gen;running=true;stopSpeech();
+ try{
+  for(let s=from;s<S.length;s++){
+   cur={s,i:0};S[s].setup();ui();
+   for(let i=0;i<S[s].steps.length;i++){
+    await waitUnpaused(g);cur.i=i;const [t,fn,hold]=S[s].steps[i];caption(t);ui();
+    const sp=speak(S[s].off+i);if(fn)await fn(mk(g));await sleep(hold||1200,g);await sp;if(g!==gen)return;
+   }
+   await sleep(500,g);
+  }
+  paused=true;running=false;cur={s:S.length-1,i:S[S.length-1].steps.length-1};ui();$('#captext').textContent='Fim. Clique em uma cena para rever ou em Reproduzir para recomeçar.';
+  ended=true;
+ }catch(e){if(!(e instanceof Cancel))throw e}
+}
+let ended=false;
+function go(i){paused=false;ended=false;run(Math.max(0,Math.min(S.length-1,i)));ui()}
+function toggle(){
+ if(ended||!running){if(ended){ended=false;cur={s:0,i:0}}paused=false;run(cur.s);ui();return}
+ paused=!paused;if(paused)pauseSpeech();else resumeSpeech();ui();
+}
+$('#play').onclick=toggle;$('#bigplay').onclick=toggle;
+$('#prev').onclick=()=>go(cur.s-(cur.i<=1?1:0));
+$('#next').onclick=()=>go(cur.s+1);
+const nb=$('#narr');
+function narrUi(){nb.setAttribute('aria-pressed',narr);$('#narrlbl').textContent=narr?'Narração ligada':'Narração desligada'}
+nb.onclick=()=>{narr=!narr;narrUi();if(!narr)stopSpeech()};
+narrUi();
+document.addEventListener('keydown',e=>{if(e.target.closest('button,input,textarea'))return;if(e.code==='Space'){e.preventDefault();toggle()}else if(e.key==='ArrowRight')go(cur.s+1);else if(e.key==='ArrowLeft')go(cur.s-1)});
+
+/* initial still frame */
+S[0].setup();caption('Aperte play para começar. A narração em português toca junto.');ui();
+})();
+</script>

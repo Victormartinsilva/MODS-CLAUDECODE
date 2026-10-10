@@ -1,0 +1,40 @@
+{
+  "name": "mods-victor",
+  "description": "Os mods do Claude Code que eu uso no dia a dia, com instalação em um passo.",
+  "owner": {
+    "name": "Victormartinsilva",
+    "url": "https://github.com/Victormartinsilva"
+  },
+  "plugins": [
+    {
+      "name": "mod-store",
+      "source": { "source": "github", "repo": "hellosverre/mod-store" },
+      "description": "/mods: loja de mods com busca, etiquetas de acesso e instalação com confirmação."
+    },
+    {
+      "name": "flightdeck",
+      "source": { "source": "github", "repo": "scasella/claude-flightdeck" },
+      "description": "Painel ao vivo com contexto, custo, permissões e subagentes."
+    },
+    {
+      "name": "skins",
+      "source": { "source": "github", "repo": "hellosverre/claude-skins" },
+      "description": "Temas para a conversa: ícones nas ferramentas, cards de diff e tabelas. /skin troca o tema."
+    },
+    {
+      "name": "pokemon",
+      "source": { "source": "github", "repo": "dgokcin/claude-pokemon-mod" },
+      "description": "Um Pokémon acima do prompt que reage ao trabalho do Claude."
+    },
+    {
+      "name": "prismantis",
+      "source": { "source": "github", "repo": "NahumLitvin/prismantis" },
+      "description": "Opcional. Tabelas, código, Mermaid e LaTeX coloridos. Conflita com o skins: use um dos dois."
+    },
+    {
+      "name": "human-in-the-loop",
+      "source": { "source": "github", "repo": "tzafrir/human-in-the-loop" },
+      "description": "Opcional. Claude passa para você, num painel, as tarefas que só você pode fazer."
+    }
+  ]
+}
